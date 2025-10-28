@@ -34,16 +34,17 @@ final class ImagesListViewController: UIViewController {
                 assertionFailure("Invalid segue destination")
                 return
             }
-
+            
             let image = UIImage(named: photosName[indexPath.row])
-            _ = viewController.view
+             // _ = viewController.view
             viewController.image = image
         } else {
             super.prepare(for: segue, sender: sender)
         }
     }
+}
     
-    // MARK: - Private Methods
+extension ImagesListViewController {
     private func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         guard let image = UIImage(named: photosName[indexPath.row]) else { return }
         
@@ -64,10 +65,13 @@ extension ImagesListViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ImagesListCell.reuseIdentifier, for: indexPath)
+        
         guard let imageListCell = cell as? ImagesListCell else {
             return UITableViewCell()
         }
+        
         configCell(for: imageListCell, with: indexPath)
+        
         return imageListCell
     }
 }

@@ -102,6 +102,6 @@ final class ProfileViewController: UIViewController {
     
     // MARK: - Actions
     @objc private func didTapLogoutButton() {
-        
+        OAuth2TokenStorage.shared.clearToken()
     }
 }
