@@ -13,8 +13,8 @@ final class SingleImageViewController: UIViewController {
     }
 
     // MARK: - Outlets
-    @IBOutlet private var imageView: UIImageView!
-    @IBOutlet private var scrollView: UIScrollView!
+    @IBOutlet weak private var imageView: UIImageView!
+    @IBOutlet weak private var scrollView: UIScrollView!
     
     // MARK: - Lifecycle Methods
     override func viewDidLoad() {

@@ -63,10 +63,9 @@ final class OAuth2Service {
             }
             
             do {
-                let decoder = JSONDecoder()
-                let responseBody = try decoder.decode(OAuthTokenResponseBody.self, from: data)
+                let responseBody = try OAuthTokenResponseBody.decodeTokenResponse(from: data)
                 DispatchQueue.main.async {
-                    completion(.success(responseBody.access_token))
+                    completion(.success(responseBody.accessToken))
                 }
             } catch {
                 print("Error parsing JSON: \(error.localizedDescription)")
@@ -77,10 +76,4 @@ final class OAuth2Service {
         }
         task.resume()
     }
-}
-
-enum OAuth2ServiceError: Error {
-    case badUrl
-    case noData
-    case jsonParsingError
 }
