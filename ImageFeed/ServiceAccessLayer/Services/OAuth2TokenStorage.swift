@@ -1,4 +1,5 @@
 import Foundation
+import SwiftKeychainWrapper
 
 final class OAuth2TokenStorage {
     // MARK: - Properties
@@ -9,13 +10,16 @@ final class OAuth2TokenStorage {
     
     var token: String? {
         get {
-            userDefaults.string(forKey: tokenKey)
+            // Получаем токен из Keychain
+            return KeychainWrapper.standard.string(forKey: tokenKey)
         }
         set {
-            if let newValue = newValue {
-                userDefaults.set(newValue, forKey: tokenKey)
+            if let token = newValue {
+                // Сохраняем токен в Keychain
+                KeychainWrapper.standard.set(token, forKey: tokenKey)
             } else {
-                userDefaults.removeObject(forKey: tokenKey)
+                // Удаляем токен из Keychain
+                KeychainWrapper.standard.removeObject(forKey: tokenKey)
             }
         }
     }
