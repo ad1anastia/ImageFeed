@@ -57,7 +57,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
             // Скрываем индикатор загрузки
             UIBlockingProgressHUD.dismiss()
             
-            guard let self = self else { return }
+            guard let self else { return }
             
             switch result {
             case .success(let token):

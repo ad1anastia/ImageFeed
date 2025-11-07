@@ -9,8 +9,8 @@ struct Profile {
 
 struct ProfileResult: Codable {
     let username: String
-    let firstName: String
-    let lastName: String
+    let firstName: String?
+    let lastName: String?
     let bio: String?
     
     private enum CodingKeys: String, CodingKey {
@@ -36,7 +36,7 @@ final class ProfileService {
             completion(.failure(URLError(.badURL)))
             return
         }
-
+        
         let task = urlSession.data(for: request) { [weak self] result in
             switch result {
             case .success(let data):
@@ -45,10 +45,11 @@ final class ProfileService {
 
                     let profile = Profile(
                         username: profileResult.username,
-                        name: profileResult.firstName,
+                        name: profileResult.firstName ?? "",
                         loginName: "@\(profileResult.username)",
                         bio: profileResult.bio
                     )
+                    self?.profile = profile
                     completion(.success(profile))
                 } catch {
                     completion(.failure(error))

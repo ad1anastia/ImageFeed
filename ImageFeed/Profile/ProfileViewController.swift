@@ -64,6 +64,7 @@ final class ProfileViewController: UIViewController {
         
         if let profile = ProfileService.shared.profile {
             updateProfileDetails(profile: profile)
+            ProfileImageService.shared.fetchProfileImageURL(username: profile.username) { _ in }
         }
         profileImageServiceObserver = NotificationCenter.default
             .addObserver(
@@ -137,6 +138,7 @@ final class ProfileViewController: UIViewController {
     
     // MARK: - Setup Methods
     private func setupProfileUI() {
+        view.backgroundColor = .ypBlack
         view.addSubview(avatarImageView)
         view.addSubview(nameLabel)
         view.addSubview(loginNameLabel)

@@ -8,16 +8,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
-    // MARK: UISceneSession Lifecycle
-    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-       let sceneConfiguration = UISceneConfiguration(
-           name: "Main",
-           sessionRole: connectingSceneSession.role
-       )
-       sceneConfiguration.delegateClass = SceneDelegate.self   
-       return sceneConfiguration
-    }
-
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
         // Called when the user discards a scene session.
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.

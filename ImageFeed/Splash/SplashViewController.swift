@@ -6,41 +6,39 @@ final class SplashViewController: UIViewController {
     private let storage = OAuth2TokenStorage.shared
     private let profileService = ProfileService.shared
     
-    private var imageView: UIImageView!
-
+    private let logoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "splashScreenLogo")
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         setupImageView()
         
         if let token = storage.token {
-            switchToTabBarController()
             fetchProfile(token: token)///Если есть токен — начинаем загрузку профиля
         } else {
             presentAuthViewController()
         }
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setNeedsStatusBarAppearanceUpdate()
     }
-
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
-    
     private func setupImageView() {
-        let imageSplashScreenLogo = UIImage(named: "splashScreenLogo")
-
-        imageView = UIImageView(image: imageSplashScreenLogo)
-
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(imageView)
-
+        view.addSubview(logoImageView)
+        
         NSLayoutConstraint.activate([
-            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            logoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
     
@@ -54,7 +52,7 @@ final class SplashViewController: UIViewController {
         authViewController.modalPresentationStyle = .fullScreen
         present(authViewController, animated: true)
     }
-
+    
     private func switchToTabBarController() {
         guard let window = UIApplication.shared.windows.first else {
             assertionFailure("Invalid window configuration")
@@ -70,36 +68,35 @@ final class SplashViewController: UIViewController {
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
         vc.dismiss(animated: true)
-
-        switchToTabBarController()
+        
         guard let token = storage.token else {
-              return
-          }
+            return
+        }
         
         fetchProfile(token: token)
     }
     
     private func fetchProfile(token: String) {
-            UIBlockingProgressHUD.show()
-            profileService.fetchProfile(token) { [weak self] result in
-                UIBlockingProgressHUD.dismiss()
-
-                guard let self = self else { return }
-
-                switch result {
-                case .success:
-                   self.switchToTabBarController()
-
-                case .failure:
-                    self.showErrorAlert()
-                    break
-                }
+        UIBlockingProgressHUD.show()
+        profileService.fetchProfile(token) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+            
+            guard let self = self else { return }
+            
+            switch result {
+            case .success:
+                self.switchToTabBarController()
+                
+            case .failure:
+                self.showErrorAlert()
+                break
             }
         }
+    }
+    
     private func showErrorAlert() {
         let alert = UIAlertController(title: "Ошибка", message: "Не удалось загрузить профиль", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "ОК", style: .default))
         present(alert, animated: true)
     }
-    
 }
