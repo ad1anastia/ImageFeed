@@ -1,10 +1,3 @@
-//
-//  NetworkError.swift
-//  ImageFeed
-//
-//  Created by Nastya Adodina on 28.10.2025.
-//
-
 import Foundation
 
 enum NetworkError: Error {

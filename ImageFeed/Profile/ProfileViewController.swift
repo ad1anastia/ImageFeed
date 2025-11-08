@@ -1,6 +1,9 @@
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
+    private var profileImageServiceObserver: NSObjectProtocol?
+    
     // MARK: - UI Elements
     private lazy var avatarImageView: UIImageView = {
         let imageView = UIImageView()
@@ -55,12 +58,87 @@ final class ProfileViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupProfileUI()
         setupConstraints()
+        
+        if let profile = ProfileService.shared.profile {
+            updateProfileDetails(profile: profile)
+            ProfileImageService.shared.fetchProfileImageURL(username: profile.username) { _ in }
+        }
+        profileImageServiceObserver = NotificationCenter.default
+            .addObserver(
+                forName: ProfileImageService.didChangeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                guard let self = self else { return }
+                self.updateAvatar()
+            }
+        updateAvatar()
+    }
+    
+    private func updateAvatar() {
+        guard
+            let profileImageURL = ProfileImageService.shared.avatarURL,
+            let imageUrl = URL(string: profileImageURL)
+        else { return }
+        
+        print("imageUrl: \(imageUrl)")
+        
+        let placeholderImage = UIImage(systemName: "person.circle.fill")?
+            .withTintColor(.lightGray, renderingMode: .alwaysOriginal)
+            .withConfiguration(UIImage.SymbolConfiguration(pointSize: 70, weight: .regular, scale: .large))
+        
+        let processor = RoundCornerImageProcessor(cornerRadius: 35)
+        avatarImageView.kf.indicatorType = .activity
+        avatarImageView.kf.setImage(
+            with: imageUrl,
+            placeholder: placeholderImage,
+            options: [
+                .processor(processor),
+                .scaleFactor(UIScreen.main.scale), // Учитываем масштаб экрана
+                .cacheOriginalImage, // Кэшируем оригинал
+                .forceRefresh // Игнорируем кэш, чтобы обновить
+            ]) { result in
+                
+                switch result {
+                    // Успешная загрузка
+                case .success(let value):
+                    // Картинка
+                    print(value.image)
+                    
+                    // Откуда картинка загружена:
+                    // - .none — из сети.
+                    // - .memory — из кэша оперативной памяти.
+                    // - .disk — из дискового кэша.
+                    print(value.cacheType)
+                    
+                    // Информация об источнике.
+                    print(value.source)
+                    
+                    // В случае ошибки
+                case .failure(let error):
+                    print(error)
+                }
+            }
+    }
+
+    private func updateProfileDetails(profile: Profile) {
+        nameLabel.text = profile.name.isEmpty
+            ? "Имя не указано"
+            : profile.name
+        loginNameLabel.text = profile.loginName.isEmpty
+            ? "@неизвестный_пользователь"
+            : profile.loginName
+        descriptionLabel.text = (profile.bio?.isEmpty ?? true)
+            ? "Профиль не заполнен"
+            : profile.bio
     }
     
     // MARK: - Setup Methods
     private func setupProfileUI() {
+        view.backgroundColor = .ypBlack
         view.addSubview(avatarImageView)
         view.addSubview(nameLabel)
         view.addSubview(loginNameLabel)
